@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip Amount Management System</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Global Styles */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        }
+        input, select, button {
+            padding: 12px;
+            margin: 5px 0;
+            border-radius: 12px;
+            border: 1px solid #ccc;
+            outline: none;
+            font-size: 14px;
+        }
+        button {
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+        /* Gradient Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg,#6a11cb,#2575fc);
+            color: white;
+            border: none;
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+        .btn-danger {
+            background: linear-gradient(135deg,#f85032,#e73827);
+            color: white;
+            border: none;
+        }
+        .btn-danger:hover {
+            opacity: 0.9;
+        }
+        .btn-info {
+            background: linear-gradient(135deg,#17ead9,#6078ea);
+            color: white;
+            border: none;
+        }
+        /* Cards */
+        .card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background: #2575fc;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        tr:nth-child(even) {background: #f9f9f9;}
+        tr:hover {background: #e0f7fa;}
+        .hidden {display: none;}
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 40px;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.2);
+        }
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 12px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+        .summary {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .summary div {
+            background: linear-gradient(135deg,#43e97b,#38f9d7);
+            padding: 20px;
+            margin: 10px;
+            border-radius: 20px;
+            color: white;
+            font-weight: 600;
+            flex: 1 1 200px;
+            text-align: center;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+        @media(max-width:768px){
+            .summary {flex-direction: column;}
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN PAGE -->
+    <div id="loginPage" class="login-container">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username (Admin Only)">
+        <input type="password" id="password" placeholder="Password">
+        <button class="btn-primary" onclick="login()">Login</button>
+        <p id="loginError" style="color:red; margin-top:10px;"></p>
+    </div>
+
+    <!-- MAIN SYSTEM -->
+    <div id="mainSystem" class="container hidden">
+
+        <h1>Trip Amount Management System</h1>
+
+        <!-- ADMIN SECTION -->
+        <div id="adminSection" class="card">
+            <h2>Student Payment Entry</h2>
+            <input type="date" id="paymentDate">
+            <input type="text" id="studentName" placeholder="Student Name">
+            <input type="number" id="paymentAmount" placeholder="Amount">
+            <button class="btn-primary" onclick="addPayment()">Add Payment</button>
+
+            <h2>Expense Entry</h2>
+            <input type="text" id="expenseName" placeholder="Expense Name">
+            <input type="number" id="expenseAmount" placeholder="Amount">
+            <button class="btn-danger" onclick="addExpense()">Add Expense</button>
+        </div>
+
+        <!-- SEARCH -->
+        <input type="text" class="search-input" placeholder="Search by Name or Date" onkeyup="filterTable(this.value)">
+
+        <!-- DATA TABLE -->
+        <div class="card">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Student Name</th>
+                        <th>Payment Amount</th>
+                        <th>Expense Name</th>
+                        <th>Expense Amount</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- SUMMARY CARDS -->
+        <div class="summary">
+            <div>Total Collection: <span id="totalCollection">0</span></div>
+            <div>Total Expenses: <span id="totalExpenses">0</span></div>
+            <div>Balance: <span id="balance">0</span></div>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div style="text-align:center; margin-top:20px;">
+            <button class="btn-info" onclick="downloadReport()">Download Report (PDF)</button>
+            <button class="btn-danger" onclick="clearAllData()">Clear All Data</button>
+        </div>
+    </div>
+
+    <!-- JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // LOGIN SYSTEM
+        let currentUser = '';
+        function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const loginError = document.getElementById('loginError');
+
+            if(username === 'MOHAN RAJ' && password === 'DRANZER') {
+                currentUser = 'admin';
+                showSystem();
+            } else if(username === '' && password === '1234') {
+                currentUser = 'student';
+                showSystem();
+            } else {
+                loginError.textContent = "Invalid credentials!";
+            }
+        }
+
+        function showSystem() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('mainSystem').classList.remove('hidden');
+            if(currentUser === 'student') document.getElementById('adminSection').style.display = 'none';
+            loadData();
+        }
+
+        // DATA STORAGE
+        let data = JSON.parse(localStorage.getItem('tripData')) || [];
+
+        function saveData() {
+            localStorage.setItem('tripData', JSON.stringify(data));
+            updateTable();
+        }
+
+        // ADD PAYMENT
+        function addPayment() {
+            const date = document.getElementById('paymentDate').value;
+            const name = document.getElementById('studentName').value;
+            const amount = parseFloat(document.getElementById('paymentAmount').value);
+            if(!date || !name || !amount) return alert('Please fill all payment fields');
+
+            data.push({date, name, payment: amount, expenseName:'', expense:0});
+            saveData();
+            clearPaymentInputs();
+        }
+        function clearPaymentInputs() {
+            document.getElementById('paymentDate').value = '';
+            document.getElementById('studentName').value = '';
+            document.getElementById('paymentAmount').value = '';
+        }
+
+        // ADD EXPENSE
+        function addExpense() {
+            const name = document.getElementById('expenseName').value;
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            if(!name || !amount) return alert('Please fill all expense fields');
+
+            data.push({date:'', name:'', payment:0, expenseName:name, expense:amount});
+            saveData();
+            clearExpenseInputs();
+        }
+        function clearExpenseInputs() {
+            document.getElementById('expenseName').value = '';
+            document.getElementById('expenseAmount').value = '';
+        }
+
+        // UPDATE TABLE
+        function updateTable() {
+            const tbody = document.querySelector('#dataTable tbody');
+            tbody.innerHTML = '';
+            data.forEach((entry, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${entry.date}</td>
+                    <td>${entry.name}</td>
+                    <td>${entry.payment}</td>
+                    <td>${entry.expenseName}</td>
+                    <td>${entry.expense}</td>
+                    <td>${currentUser==='admin'?`<button class="btn-info" onclick="editEntry(${index})">Edit</button>`:''}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            calculateSummary();
+        }
+
+        // CALCULATE SUMMARY
+        function calculateSummary() {
+            const totalPayment = data.reduce((sum, d) => sum + d.payment, 0);
+            const totalExpense = data.reduce((sum, d) => sum + d.expense, 0);
+            document.getElementById('totalCollection').textContent = totalPayment;
+            document.getElementById('totalExpenses').textContent = totalExpense;
+            document.getElementById('balance').textContent = totalPayment - totalExpense;
+        }
+
+        // EDIT ENTRY
+        function editEntry(index) {
+            const entry = data[index];
+            const newDate = prompt("Enter date:", entry.date);
+            const newName = prompt("Enter student name:", entry.name);
+            const newPayment = prompt("Enter payment amount:", entry.payment);
+            const newExpenseName = prompt("Enter expense name:", entry.expenseName);
+            const newExpense = prompt("Enter expense amount:", entry.expense);
+
+            data[index] = {
+                date: newDate,
+                name: newName,
+                payment: parseFloat(newPayment) || 0,
+                expenseName: newExpenseName,
+                expense: parseFloat(newExpense) || 0
+            };
+            saveData();
+        }
+
+        // CLEAR DATA
+        function clearAllData() {
+            if(confirm("Are you sure to clear all data?")) {
+                data = [];
+                saveData();
+            }
+        }
+
+        // FILTER
+        function filterTable(query) {
+            query = query.toLowerCase();
+            const tbody = document.querySelector('#dataTable tbody');
+            Array.from(tbody.rows).forEach(row => {
+                const name = row.cells[1].textContent.toLowerCase();
+                const date = row.cells[0].textContent.toLowerCase();
+                row.style.display = (name.includes(query) || date.includes(query)) ? '' : 'none';
+            });
+        }
+
+        // PDF REPORT
+        async function downloadReport() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(16);
+            doc.text("Trip Amount Report", 105, 10, null, null, "center");
+            let y = 20;
+            data.forEach(d => {
+                doc.setFontSize(12);
+                doc.text(`Date: ${d.date} | Name: ${d.name} | Payment: ${d.payment} | Expense: ${d.expenseName}-${d.expense}`, 10, y);
+                y += 8;
+            });
+            y += 10;
+            doc.text(`Total Collection: ${document.getElementById('totalCollection').textContent}`, 10, y);
+            doc.text(`Total Expenses: ${document.getElementById('totalExpenses').textContent}`, 10, y+10);
+            doc.text(`Balance: ${document.getElementById('balance').textContent}`, 10, y+20);
+            doc.save('Trip_Report.pdf');
+        }
+
+        function loadData() {
+            updateTable();
+        }
+    </script>
+
+</body>
+</html>
